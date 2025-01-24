@@ -11,7 +11,7 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Game - Floating".to_string(),
+                        title: "GGJ2025".to_string(),
                         resolution: WindowResolution::new(1600.0, 900.0),
                         ..default()
                     }),
