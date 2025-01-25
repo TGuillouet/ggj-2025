@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use events::PlayerLostEvent;
 
 mod enemies;
 mod events;
@@ -16,17 +15,42 @@ enum ScreenState {
     Finished,
 }
 
-pub struct GameplayPlugin;
+#[derive(Resource)]
+struct WinTimer(Timer);
 
+fn reset_win_timer(mut win_timer: ResMut<WinTimer>) {
+    win_timer.0.reset();
+}
+
+fn update_win_timer(
+    mut win_timer: ResMut<WinTimer>,
+    time: Res<Time>,
+    mut next_state: ResMut<NextState<ScreenState>>,
+) {
+    win_timer.0.tick(time.delta());
+
+    if !win_timer.0.finished() {
+        return;
+    }
+
+    next_state.set(ScreenState::Finished);
+}
+
+pub struct GameplayPlugin;
 impl Plugin for GameplayPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(enemies::SpawnTimer::new(3))
+            .insert_resource(WinTimer(Timer::from_seconds(5.0, TimerMode::Once)))
             .insert_state(ScreenState::default())
-            .add_event::<PlayerLostEvent>()
+            .add_event::<events::WinEvent>()
             .add_plugins(ui::UiPlugin)
             .add_systems(
                 OnEnter(ScreenState::InGame),
-                (player::setup_player, platform::spawn_platforms),
+                (
+                    reset_win_timer,
+                    player::setup_player,
+                    platform::spawn_platforms,
+                ),
             )
             .add_systems(
                 OnExit(ScreenState::InGame),
@@ -48,6 +72,7 @@ impl Plugin for GameplayPlugin {
                     enemies::collide_player_with_projectile,
                 )
                     .run_if(in_state(ScreenState::InGame)),
-            );
+            )
+            .add_systems(Update, (update_win_timer,));
     }
 }

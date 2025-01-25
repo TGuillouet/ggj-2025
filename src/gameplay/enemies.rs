@@ -111,7 +111,6 @@ pub fn collide_player_with_projectile(
     projectiles_query: Query<Entity, With<Projectile>>,
     player_query: Query<Entity, With<Player>>,
     mut contact_events: EventReader<CollisionEvent>,
-    mut player_lost_writer: EventWriter<super::events::PlayerLostEvent>,
     mut next_state: ResMut<NextState<ScreenState>>,
 ) {
     let player_entity = player_query.single();
@@ -124,7 +123,6 @@ pub fn collide_player_with_projectile(
             if (entity_a == &projectile && entity_b == &player_entity)
                 || (entity_a == &player_entity && entity_b == &projectile)
             {
-                player_lost_writer.send_default();
                 next_state.set(ScreenState::GameOver);
             }
         }
