@@ -23,6 +23,7 @@ impl Plugin for GameplayPlugin {
         app.insert_resource(enemies::SpawnTimer::new(3))
             .insert_state(ScreenState::default())
             .add_event::<PlayerLostEvent>()
+            .add_plugins(ui::UiPlugin)
             .add_systems(
                 OnEnter(ScreenState::InGame),
                 (player::setup_player, platform::spawn_platforms),

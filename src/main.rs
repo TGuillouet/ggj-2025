@@ -11,6 +11,7 @@ fn setup(mut commands: Commands, mut rapier_config: Query<&mut RapierConfigurati
     rapier_config.gravity = Vec2::ZERO;
     commands.spawn((
         Camera2d,
+        IsDefaultUiCamera,
         Projection::from(OrthographicProjection {
             scaling_mode: bevy::render::camera::ScalingMode::Fixed {
                 width: 1600.0,
