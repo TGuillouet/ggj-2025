@@ -4,9 +4,7 @@ use bevy::{
     color::palettes::css::{BLACK, RED},
     prelude::*,
 };
-use bevy_rapier2d::prelude::{
-    ActiveCollisionTypes, ActiveEvents, Collider, RigidBody, Sensor, Velocity,
-};
+use bevy_rapier2d::prelude::{ActiveEvents, Collider, RigidBody, Sensor, Velocity};
 use rand::Rng;
 
 use super::player::Player;
@@ -73,6 +71,7 @@ pub fn rotate_duck_toward_player(
     }
 }
 
+const PROJECTILE_SPEED: f32 = 200.0;
 pub fn shoot(
     mut commands: Commands,
     mut ducks_query: Query<(Entity, &mut ShootingTimer, &Transform), With<Duck>>,
@@ -86,18 +85,18 @@ pub fn shoot(
         }
 
         // Shoot
+        let (_, angle) = duck_transform.rotation.to_axis_angle();
         commands.spawn((
             Projectile,
             Sprite::from_color(RED, Vec2::splat(16.0)),
-            RigidBody::KinematicVelocityBased,
+            RigidBody::Dynamic,
             Velocity {
-                linvel: duck_transform.clone().forward().xy() * 300.0,
+                linvel: Vec2::new(angle.cos(), angle.sin()) * 200.0,
                 ..default()
             },
-            duck_transform.clone(),
+            *duck_transform,
             ActiveEvents::COLLISION_EVENTS,
             Sensor,
-            ActiveCollisionTypes::DYNAMIC_DYNAMIC,
             Collider::cuboid(10.0, 10.0),
         ));
 
