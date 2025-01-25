@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::{
     ActiveCollisionTypes, ActiveEvents, Collider, CollisionEvent, LockedAxes, RigidBody, Velocity,
 };
 
-const PLAYER_SPEED: f32 = 50.0;
+const PLAYER_SPEED: f32 = 100.0;
 const JUMP_FORCE: f32 = 100.0;
 
 #[derive(Component)]
@@ -26,7 +26,7 @@ impl Player {
 pub fn setup_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     let sprite = Sprite::from_image(asset_server.load("player.png"));
     commands.spawn((
-        Player::default(),
+        Player { is_grounded: false },
         sprite,
         Transform::from_xyz(0.0, 0.0, 0.0),
         RigidBody::Dynamic,
@@ -49,10 +49,7 @@ pub fn update_movement(
         return;
     };
 
-    if inputs.just_released(KeyCode::KeyD) {
-        velocity.linvel.x = 0.0;
-    }
-    if inputs.just_released(KeyCode::KeyA) {
+    if inputs.just_released(KeyCode::KeyD) || inputs.just_released(KeyCode::KeyA) {
         velocity.linvel.x = 0.0;
     }
 
@@ -65,11 +62,11 @@ pub fn update_movement(
 
     if inputs.pressed(KeyCode::Space) && player.is_grounded {
         // Apply a force to the player
-        velocity.linvel.y = JUMP_FORCE;
+        velocity.linvel.y += JUMP_FORCE;
     }
 
-    if !player.is_grounded {
-        velocity.linvel.y = -100.0;
+    if !player.is_grounded && velocity.linvel.y > -100.0 {
+        velocity.linvel.y -= 1.0;
     }
 }
 
