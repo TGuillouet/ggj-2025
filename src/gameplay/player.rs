@@ -1,10 +1,6 @@
 use bevy::{prelude::*, render::render_resource::encase::vector::FromVectorParts};
-use bevy_rapier2d::{
-    prelude::{
-        ActiveCollisionTypes, ActiveEvents, Collider, CollisionEvent, LockedAxes, RigidBody,
-        Sensor, Velocity,
-    },
-    rapier::prelude::Contact,
+use bevy_rapier2d::prelude::{
+    ActiveCollisionTypes, ActiveEvents, Collider, CollisionEvent, LockedAxes, RigidBody, Velocity,
 };
 
 const PLAYER_SPEED: f32 = 50.0;
@@ -12,16 +8,12 @@ const JUMP_FORCE: f32 = 100.0;
 
 #[derive(Component)]
 pub struct Player {
-    jump_impulse: f32,
     is_grounded: bool,
 }
 
 impl Default for Player {
     fn default() -> Self {
-        Self {
-            jump_impulse: 2.0,
-            is_grounded: false,
-        }
+        Self { is_grounded: false }
     }
 }
 
@@ -88,7 +80,6 @@ pub fn update_grounded_flag(
     let (player_entity, mut player) = player_query.single_mut();
 
     for collision_event in contact_events.read() {
-        // println!("Received collision event: {collision_event:?}");
         let is_grounded = match collision_event {
             CollisionEvent::Started(e1, e2, _flags) => e1 == &player_entity || e2 == &player_entity,
             CollisionEvent::Stopped(e1, e2, _flags) => {

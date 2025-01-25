@@ -36,7 +36,6 @@ pub fn spawn_platforms(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn(platform)
         .insert(ActiveEvents::COLLISION_EVENTS)
-        // .insert(Sensor)
         .insert(Velocity {
             linvel: Vec2::from_parts([0.0, -30.0]),
             angvel: 0.0,
