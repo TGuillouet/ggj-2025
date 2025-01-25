@@ -4,7 +4,9 @@ use bevy::{
     color::palettes::css::{BLACK, RED},
     prelude::*,
 };
-use bevy_rapier2d::prelude::{ActiveEvents, Collider, RigidBody, Sensor, Velocity};
+use bevy_rapier2d::prelude::{
+    ActiveCollisionTypes, ActiveEvents, Collider, CollisionEvent, RigidBody, Sensor, Velocity,
+};
 use rand::Rng;
 
 use super::player::Player;
@@ -96,10 +98,32 @@ pub fn shoot(
             },
             *duck_transform,
             ActiveEvents::COLLISION_EVENTS,
+            ActiveCollisionTypes::DYNAMIC_DYNAMIC,
             Sensor,
             Collider::cuboid(10.0, 10.0),
         ));
 
         commands.entity(entity).despawn();
+    }
+}
+
+pub fn collide_player_with_projectile(
+    projectiles_query: Query<Entity, With<Projectile>>,
+    player_query: Query<Entity, With<Player>>,
+    mut contact_events: EventReader<CollisionEvent>,
+) {
+    let player_entity = player_query.single();
+    for event in contact_events.read() {
+        let CollisionEvent::Started(entity_a, entity_b, _flags) = event else {
+            continue;
+        };
+
+        for projectile in projectiles_query.iter() {
+            if (entity_a == &projectile && entity_b == &player_entity)
+                || (entity_a == &player_entity && entity_b == &projectile)
+            {
+                println!("Player lost !");
+            }
+        }
     }
 }

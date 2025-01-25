@@ -6,12 +6,10 @@ use bevy_rapier2d::prelude::{
 const PLAYER_SPEED: f32 = 100.0;
 const JUMP_FORCE: f32 = 250.0;
 
-#[derive(Component)]
-#[derive(Default)]
+#[derive(Component, Default)]
 pub struct Player {
     is_grounded: bool,
 }
-
 
 impl Player {
     pub fn set_grounded(&mut self, new_state: bool) {

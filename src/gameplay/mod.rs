@@ -20,6 +20,7 @@ impl Plugin for GameplayPlugin {
                     enemies::spawn_ducks_slots,
                     enemies::rotate_duck_toward_player,
                     enemies::shoot,
+                    enemies::collide_player_with_projectile,
                 ),
             );
     }
