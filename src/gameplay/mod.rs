@@ -23,6 +23,7 @@ impl Plugin for GameplayPlugin {
                 player::update_grounded_flag,
                 platform::update_slot_timer,
                 enemies::handle_duck_spawning,
+                enemies::handle_shooting.after(enemies::move_spawning_ducks),
                 enemies::move_spawning_ducks.after(enemies::handle_duck_spawning),
             ),
         );
