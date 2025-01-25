@@ -48,7 +48,7 @@ pub fn update_slot_timer(
     for (mut slot, transform) in slots_query.iter_mut() {
         slot.0.tick(delta_time.delta());
         if slot.0.just_finished() {
-            let platform = create_platform(transform.clone(), &asset_server);
+            let platform = create_platform(*transform, &asset_server);
 
             commands.spawn(platform);
 

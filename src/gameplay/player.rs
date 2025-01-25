@@ -7,15 +7,11 @@ const PLAYER_SPEED: f32 = 100.0;
 const JUMP_FORCE: f32 = 250.0;
 
 #[derive(Component)]
+#[derive(Default)]
 pub struct Player {
     is_grounded: bool,
 }
 
-impl Default for Player {
-    fn default() -> Self {
-        Self { is_grounded: false }
-    }
-}
 
 impl Player {
     pub fn set_grounded(&mut self, new_state: bool) {
@@ -62,7 +58,7 @@ pub fn update_movement(
 
     if inputs.pressed(KeyCode::Space) && player.is_grounded {
         // Apply a force to the player
-        velocity.linvel.y += JUMP_FORCE;
+        velocity.linvel.y = JUMP_FORCE;
     }
 
     if !player.is_grounded && velocity.linvel.y > -100.0 {
