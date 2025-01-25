@@ -1,3 +1,9 @@
-pub struct UiPlugin {}
+use bevy::prelude::*;
 
-impl UiPlugin {}
+pub struct UiPlugin;
+
+impl Plugin for UiPlugin {
+    fn build(&self, app: &mut App) {
+        // app.
+    }
+}
