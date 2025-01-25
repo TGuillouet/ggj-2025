@@ -62,7 +62,7 @@ pub fn update_movement(
 
     if inputs.pressed(KeyCode::Space) && player.is_grounded {
         // Apply a force to the player
-        velocity.linvel.y += JUMP_FORCE;
+        velocity.linvel.y = JUMP_FORCE;
     }
 
     if !player.is_grounded && velocity.linvel.y > -100.0 {
