@@ -1,7 +1,4 @@
-use bevy::{
-    color::palettes::css::GRAY, prelude::*, render::camera::CameraProjection,
-    window::WindowResolution,
-};
+use bevy::{prelude::*, window::WindowResolution};
 use bevy_rapier2d::{
     plugin::{NoUserData, RapierConfiguration, RapierPhysicsPlugin},
     render::RapierDebugRenderPlugin,
