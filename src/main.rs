@@ -2,11 +2,12 @@ use bevy::{prelude::*, window::WindowResolution};
 use bevy_rapier2d::plugin::{NoUserData, RapierConfiguration, RapierPhysicsPlugin};
 
 mod gameplay;
+mod menu;
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 enum AppState {
-    MainMenu,
     #[default]
+    MainMenu,
     Game,
 }
 
@@ -46,6 +47,7 @@ fn main() {
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(2.0))
         // .add_plugins(RapierDebugRenderPlugin::default())
         .add_systems(Startup, setup)
+        .add_plugins(menu::MainMenuPlugin)
         .add_plugins(gameplay::GameplayPlugin)
         .run();
 }
