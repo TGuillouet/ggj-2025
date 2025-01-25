@@ -4,7 +4,7 @@ use bevy_rapier2d::prelude::{
 };
 
 const PLAYER_SPEED: f32 = 100.0;
-const JUMP_FORCE: f32 = 100.0;
+const JUMP_FORCE: f32 = 250.0;
 
 #[derive(Component)]
 pub struct Player {
@@ -28,7 +28,7 @@ pub fn setup_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         Player { is_grounded: false },
         sprite,
-        Transform::from_xyz(0.0, 0.0, 0.0),
+        Transform::from_xyz(0.0, 30.0, 0.0),
         RigidBody::Dynamic,
         Collider::cuboid(10.0, 10.0),
         Velocity {
@@ -66,7 +66,11 @@ pub fn update_movement(
     }
 
     if !player.is_grounded && velocity.linvel.y > -100.0 {
-        velocity.linvel.y -= 1.0;
+        velocity.linvel.y -= 2.0;
+    }
+
+    if velocity.linvel.y < -100.0 {
+        velocity.linvel.y = -100.0;
     }
 }
 

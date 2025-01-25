@@ -1,18 +1,11 @@
-use bevy::{
-    color::palettes::css::{GREEN, RED},
-    prelude::*,
-    render::render_resource::encase::vector::FromVectorParts,
-};
-use bevy_rapier2d::prelude::{ActiveEvents, Collider, GravityScale, RigidBody, Sensor, Velocity};
+use std::time::Duration;
 
-use super::player::Player;
+use bevy::{prelude::*, render::render_resource::encase::vector::FromVectorParts};
+use bevy_rapier2d::prelude::{ActiveEvents, Collider, RigidBody, Velocity};
+use rand::Rng;
 
 #[derive(Component)]
-// #[require(Transform)]
 pub struct Platform;
-
-// #[derive(Component)]
-// pub struct Collider(Rect);
 
 #[derive(Bundle)]
 pub struct PlatformBundle {
@@ -21,65 +14,62 @@ pub struct PlatformBundle {
     transform: Transform,
     rigidbody: RigidBody,
     collider: Collider,
+    active_event: ActiveEvents,
+    velocity: Velocity,
 }
 
-pub fn spawn_platforms(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let image_handle = asset_server.load("bubble.png");
-    let platform = PlatformBundle {
+#[derive(Component)]
+pub struct BubbleSlot(Timer);
+
+pub fn spawn_platforms(mut commands: Commands, assets_server: Res<AssetServer>) {
+    let mut rng = rand::thread_rng();
+    let slots_y = 200.0;
+    let slots_x: [f32; 7] = [-300.0, -200.0, -100.0, 0.0, 100.0, 200.0, 300.0];
+
+    for slot_x in slots_x.into_iter() {
+        commands
+            .spawn(BubbleSlot(Timer::new(
+                Duration::from_millis(rng.gen_range(0.0..2000.0) as u64),
+                TimerMode::Once,
+            )))
+            .insert(Transform::from_xyz(slot_x, slots_y, 0.0));
+
+        let platform = create_platform(Transform::from_xyz(slot_x, 0.0, 0.0), &assets_server);
+        commands.spawn(platform);
+    }
+}
+
+pub fn update_slot_timer(
+    mut slots_query: Query<(&mut BubbleSlot, &Transform)>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    delta_time: Res<Time>,
+) {
+    for (mut slot, transform) in slots_query.iter_mut() {
+        slot.0.tick(delta_time.delta());
+        if slot.0.just_finished() {
+            let platform = create_platform(transform.clone(), &asset_server);
+
+            commands.spawn(platform);
+
+            slot.0.set_duration(Duration::from_secs_f32(4.0));
+            slot.0.reset();
+        }
+    }
+}
+
+fn create_platform(transform: Transform, assets_server: &Res<AssetServer>) -> PlatformBundle {
+    let image_handle = assets_server.load("bubble.png");
+    PlatformBundle {
         platform: Platform,
-        transform: Transform::from_xyz(0.0, -100.0, 0.0),
+        transform,
         sprite: Sprite::from_image(image_handle),
         rigidbody: RigidBody::KinematicVelocityBased,
         collider: Collider::cuboid(10.0, 10.0),
-    };
-
-    commands
-        .spawn(platform)
-        .insert(ActiveEvents::COLLISION_EVENTS)
-        .insert(Velocity {
+        active_event: ActiveEvents::COLLISION_EVENTS,
+        velocity: Velocity {
             linvel: Vec2::from_parts([0.0, -30.0]),
             angvel: 0.0,
-        });
-}
-
-pub fn handle_player_collision(
-    // platforms_query: Query<(&Transform, &Collider, &Sprite), With<Platform>>,
-    platforms_query: Query<(&Platform)>,
-    // assets: Res<Assets<Image>>,
-    mut player_query: Query<(&Transform, &Sprite, &mut Player)>,
-    // mut gizmos: Gizmos,
-) {
-    let Ok((player_transform, player_sprite, mut player)) = player_query.get_single_mut() else {
-        return;
-    };
-
-    // let player_dimensions = assets.get(&player_sprite.image).unwrap().size_f32();
-    // let player_collider =
-    //     Rect::from_center_size(player_transform.translation.truncate(), player_dimensions);
-    //
-    // gizmos.rect_2d(
-    //     Isometry2d::from_translation(player_transform.translation.truncate()),
-    //     player_collider.size(),
-    //     GREEN,
-    // );
-    //
-    // for platform in platforms_query.iter() {
-    //     let image_dimensions = assets.get(&platform.2.image).unwrap().size_f32();
-    //     let collider_position =
-    //         Vec2::from_parts([platform.0.translation.x, platform.0.translation.y + 2.]);
-    //     let mut collider_size = platform.0.scale.truncate();
-    //     collider_size.x += 1.0;
-    //
-    //     let collider = Rect::from_center_size(collider_position, image_dimensions * collider_size);
-    //
-    //     gizmos.rect_2d(
-    //         Isometry2d::from_xy(collider_position.x, collider_position.y),
-    //         collider.size(),
-    //         RED,
-    //     );
-    //
-    //     if !collider.intersect(player_collider).is_empty() {
-    //         player.set_grounded(true);
-    //     }
-    // }
+        },
+    }
 }

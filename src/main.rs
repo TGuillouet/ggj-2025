@@ -15,6 +15,10 @@ fn setup(mut commands: Commands, mut rapier_config: Query<&mut RapierConfigurati
     commands.spawn((
         Camera2d,
         Projection::from(OrthographicProjection {
+            scaling_mode: bevy::render::camera::ScalingMode::Fixed {
+                width: 1600.0,
+                height: 900.0,
+            },
             scale: 0.5,
             ..OrthographicProjection::default_2d()
         }),

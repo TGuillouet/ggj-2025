@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+mod enemies;
 mod platform;
 mod player;
 
@@ -12,8 +13,8 @@ impl Plugin for GameplayPlugin {
                 FixedUpdate,
                 (
                     player::update_movement,
-                    platform::handle_player_collision,
                     player::update_grounded_flag,
+                    platform::update_slot_timer,
                 ),
             );
     }
