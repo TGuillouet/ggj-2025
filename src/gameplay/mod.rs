@@ -10,8 +10,8 @@ mod ui;
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 enum ScreenState {
-    InGame,
     #[default]
+    InGame,
     GameOver,
     Finished,
 }

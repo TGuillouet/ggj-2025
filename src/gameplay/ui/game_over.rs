@@ -1,8 +1,14 @@
 use bevy::prelude::*;
 
+use crate::gameplay::ScreenState;
+
+#[derive(Component)]
+pub struct GameOverMenu;
+
 pub fn spawn_menu(mut commands: Commands, assets_server: Res<AssetServer>) {
     commands
         .spawn((
+            GameOverMenu,
             Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
@@ -49,4 +55,20 @@ pub fn spawn_menu(mut commands: Commands, assets_server: Res<AssetServer>) {
                 },
             ));
         });
+}
+
+pub fn return_to_main_menu(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut next_state: ResMut<NextState<ScreenState>>,
+) {
+    if !keyboard_input.any_pressed([KeyCode::Space, KeyCode::Enter]) {
+        return;
+    }
+
+    next_state.set(ScreenState::InGame);
+}
+
+pub fn despawn_menu(mut commands: Commands, menu_query: Query<Entity, With<GameOverMenu>>) {
+    let menu = menu_query.single();
+    commands.entity(menu).despawn_recursive();
 }
