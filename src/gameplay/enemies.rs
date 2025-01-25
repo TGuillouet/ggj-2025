@@ -111,6 +111,7 @@ pub fn collide_player_with_projectile(
     projectiles_query: Query<Entity, With<Projectile>>,
     player_query: Query<Entity, With<Player>>,
     mut contact_events: EventReader<CollisionEvent>,
+    mut player_lost_writer: EventWriter<super::events::PlayerLostEvent>,
 ) {
     let player_entity = player_query.single();
     for event in contact_events.read() {
@@ -122,8 +123,21 @@ pub fn collide_player_with_projectile(
             if (entity_a == &projectile && entity_b == &player_entity)
                 || (entity_a == &player_entity && entity_b == &projectile)
             {
-                println!("Player lost !");
+                player_lost_writer.send_default();
             }
         }
     }
+}
+
+pub fn despawn_enemies(
+    mut commands: Commands,
+    ducks_query: Query<Entity, With<Duck>>,
+    projectiles_query: Query<Entity, With<Projectile>>,
+) {
+    ducks_query.iter().for_each(|item| {
+        commands.entity(item).despawn_recursive();
+    });
+    projectiles_query.iter().for_each(|item| {
+        commands.entity(item).despawn_recursive();
+    });
 }

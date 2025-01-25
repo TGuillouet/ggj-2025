@@ -73,3 +73,9 @@ fn create_platform(transform: Transform, assets_server: &Res<AssetServer>) -> Pl
         },
     }
 }
+
+pub fn despawn_platforms(mut commands: Commands, platforms_query: Query<Entity, With<Platform>>) {
+    platforms_query.iter().for_each(|item| {
+        commands.entity(item).despawn_recursive();
+    });
+}
