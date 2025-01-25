@@ -9,7 +9,7 @@ use bevy_rapier2d::prelude::{
 };
 use rand::Rng;
 
-use super::player::Player;
+use super::{ScreenState, player::Player};
 
 #[derive(Component)]
 pub struct Duck;
@@ -112,6 +112,7 @@ pub fn collide_player_with_projectile(
     player_query: Query<Entity, With<Player>>,
     mut contact_events: EventReader<CollisionEvent>,
     mut player_lost_writer: EventWriter<super::events::PlayerLostEvent>,
+    mut next_state: ResMut<NextState<ScreenState>>,
 ) {
     let player_entity = player_query.single();
     for event in contact_events.read() {
@@ -124,6 +125,7 @@ pub fn collide_player_with_projectile(
                 || (entity_a == &player_entity && entity_b == &projectile)
             {
                 player_lost_writer.send_default();
+                next_state.set(ScreenState::GameOver);
             }
         }
     }
