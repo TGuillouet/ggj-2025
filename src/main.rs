@@ -1,12 +1,29 @@
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{
+    color::palettes::css::GRAY, prelude::*, render::camera::CameraProjection,
+    window::WindowResolution,
+};
+use bevy_rapier2d::{
+    plugin::{NoUserData, RapierConfiguration, RapierPhysicsPlugin},
+    render::RapierDebugRenderPlugin,
+};
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2d);
-    commands.spawn(Sprite::from_image(asset_server.load("bevy_logo_dark.png")));
+mod gameplay;
+
+fn setup(mut commands: Commands, mut rapier_config: Query<&mut RapierConfiguration>) {
+    let mut rapier_config = rapier_config.single_mut();
+    rapier_config.gravity = Vec2::ZERO;
+    commands.spawn((
+        Camera2d,
+        Projection::from(OrthographicProjection {
+            scale: 0.5,
+            ..OrthographicProjection::default_2d()
+        }),
+    ));
 }
 
 fn main() {
     App::new()
+        .insert_resource(ClearColor(Color::linear_rgb(0.3, 0.3, 0.3)))
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
@@ -19,6 +36,9 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(2.0))
+        .add_plugins(RapierDebugRenderPlugin::default())
         .add_systems(Startup, setup)
+        .add_plugins(gameplay::GameplayPlugin)
         .run();
 }
