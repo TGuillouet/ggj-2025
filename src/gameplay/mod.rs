@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::AppState;
+
 mod enemies;
 mod events;
 mod platform;
@@ -50,7 +52,8 @@ impl Plugin for GameplayPlugin {
                     reset_win_timer,
                     player::setup_player,
                     platform::spawn_platforms,
-                ),
+                )
+                    .run_if(in_state(AppState::Game)),
             )
             .add_systems(
                 OnExit(ScreenState::InGame),
@@ -58,7 +61,8 @@ impl Plugin for GameplayPlugin {
                     player::despawn_player,
                     platform::despawn_platforms,
                     enemies::despawn_enemies,
-                ),
+                )
+                    .run_if(in_state(AppState::Game)),
             )
             .add_systems(
                 FixedUpdate,
@@ -71,8 +75,14 @@ impl Plugin for GameplayPlugin {
                     enemies::shoot,
                     enemies::collide_player_with_projectile,
                 )
+                    .run_if(in_state(AppState::Game))
                     .run_if(in_state(ScreenState::InGame)),
             )
-            .add_systems(Update, (update_win_timer,));
+            .add_systems(
+                Update,
+                (update_win_timer,)
+                    .run_if(in_state(AppState::Game))
+                    .run_if(in_state(ScreenState::InGame)),
+            );
     }
 }
