@@ -47,12 +47,13 @@ impl Plugin for GameplayPlugin {
             .add_event::<events::WinEvent>()
             .add_plugins(ui::UiPlugin)
             .add_systems(
-                OnEnter(ScreenState::InGame),
+                OnEnter(AppState::Game),
                 (
                     reset_win_timer,
                     player::setup_player,
                     platform::spawn_platforms,
                 )
+                    .run_if(in_state(ScreenState::InGame))
                     .run_if(in_state(AppState::Game)),
             )
             .add_systems(

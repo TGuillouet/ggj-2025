@@ -1,8 +1,17 @@
 use bevy::prelude::*;
 
+use crate::AppState;
+
+#[derive(Component)]
+pub struct MainMenu;
+
+#[derive(Component)]
+pub struct PlayButton;
+
 pub fn spawn_menu(mut commands: Commands, assets_server: Res<AssetServer>) {
     commands
         .spawn((
+            MainMenu,
             Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
@@ -32,11 +41,11 @@ pub fn spawn_menu(mut commands: Commands, assets_server: Res<AssetServer>) {
             ));
 
             children
-                .spawn(Node {
+                .spawn((Button, PlayButton, Node {
                     width: Val::Px(200.0),
                     height: Val::Px(50.0),
                     ..default()
-                })
+                }))
                 .with_children(|children| {
                     children.spawn((
                         ImageNode::new(assets_server.load("button.png")),
@@ -57,4 +66,24 @@ pub fn spawn_menu(mut commands: Commands, assets_server: Res<AssetServer>) {
                     ));
                 });
         });
+}
+
+pub fn handle_play_interaction(
+    play_interactions_query: Query<
+        &Interaction,
+        (Changed<Interaction>, With<PlayButton>, With<Button>),
+    >,
+    mut next_state: ResMut<NextState<AppState>>,
+) {
+    for interaction in play_interactions_query.iter() {
+        match *interaction {
+            Interaction::Pressed => next_state.set(AppState::Game),
+            _ => {}
+        };
+    }
+}
+
+pub fn despawn_menu(mut commands: Commands, ui_query: Query<Entity, With<MainMenu>>) {
+    let main_menu_entity = ui_query.single();
+    commands.entity(main_menu_entity).despawn_recursive();
 }
