@@ -46,6 +46,9 @@ impl Plugin for GameplayPlugin {
             .insert_state(ScreenState::default())
             .add_event::<events::WinEvent>()
             .add_plugins(ui::UiPlugin)
+            //
+            // Startup systems
+            //
             .add_systems(
                 OnEnter(AppState::Game),
                 (
@@ -57,6 +60,19 @@ impl Plugin for GameplayPlugin {
                     .run_if(in_state(AppState::Game)),
             )
             .add_systems(
+                OnEnter(ScreenState::InGame),
+                (
+                    reset_win_timer,
+                    player::setup_player,
+                    platform::spawn_platforms,
+                )
+                    .run_if(in_state(ScreenState::InGame))
+                    .run_if(in_state(AppState::Game)),
+            )
+            //
+            // Cleanup systems
+            //
+            .add_systems(
                 OnExit(ScreenState::InGame),
                 (
                     player::despawn_player,
@@ -65,6 +81,9 @@ impl Plugin for GameplayPlugin {
                 )
                     .run_if(in_state(AppState::Game)),
             )
+            //
+            // Update systems
+            //
             .add_systems(
                 FixedUpdate,
                 (
