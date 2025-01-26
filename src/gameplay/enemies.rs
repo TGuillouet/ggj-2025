@@ -73,7 +73,6 @@ pub fn rotate_duck_toward_player(
     }
 }
 
-const PROJECTILE_SPEED: f32 = 200.0;
 pub fn shoot(
     mut commands: Commands,
     mut ducks_query: Query<(Entity, &mut ShootingTimer, &Transform), With<Duck>>,
