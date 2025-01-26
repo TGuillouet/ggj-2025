@@ -68,13 +68,20 @@ fn create_platform(transform: Transform, assets_server: &Res<AssetServer>) -> Pl
         collider: Collider::cuboid(10.0, 10.0),
         active_event: ActiveEvents::COLLISION_EVENTS,
         velocity: Velocity {
-            linvel: Vec2::from_parts([0.0, -30.0]),
+            linvel: Vec2::from_parts([0.0, -40.0]),
             angvel: 0.0,
         },
     }
 }
 
-pub fn despawn_platforms(mut commands: Commands, platforms_query: Query<Entity, With<Platform>>) {
+pub fn despawn_platforms(
+    mut commands: Commands,
+    platforms_query: Query<Entity, With<Platform>>,
+    slots_query: Query<Entity, With<BubbleSlot>>,
+) {
+    slots_query.iter().for_each(|item| {
+        commands.entity(item).despawn_recursive();
+    });
     platforms_query.iter().for_each(|item| {
         commands.entity(item).despawn_recursive();
     });

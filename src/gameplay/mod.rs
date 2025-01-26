@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy::{ecs::system::SystemParam, input::common_conditions::input_pressed, prelude::*};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_rapier2d::prelude::{BevyPhysicsHooks, PairFilterContextView, SolverFlags};
 
 use crate::AppState;
 
@@ -42,9 +44,10 @@ pub struct GameplayPlugin;
 impl Plugin for GameplayPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(enemies::SpawnTimer::new(3))
-            .insert_resource(WinTimer(Timer::from_seconds(5.0, TimerMode::Once)))
+            .insert_resource(WinTimer(Timer::from_seconds(30.0, TimerMode::Once)))
             .insert_state(ScreenState::default())
             .add_event::<events::WinEvent>()
+            .add_plugins(WorldInspectorPlugin::new())
             .add_plugins(ui::UiPlugin)
             //
             // Startup systems
@@ -87,7 +90,7 @@ impl Plugin for GameplayPlugin {
             .add_systems(
                 FixedUpdate,
                 (
-                    player::update_movement,
+                    player::update_movement.after(player::update_grounded_flag),
                     player::update_grounded_flag,
                     platform::update_slot_timer,
                     enemies::spawn_ducks_slots,
@@ -100,7 +103,12 @@ impl Plugin for GameplayPlugin {
             )
             .add_systems(
                 Update,
-                (update_win_timer,)
+                (
+                    update_win_timer,
+                    player::animate_player_idle.run_if(not(input_pressed(KeyCode::Space))),
+                    // player::animate_player_jump.run_if(input_pressed(KeyCode::Space)),
+                    // player::update_visibility,
+                )
                     .run_if(in_state(AppState::Game))
                     .run_if(in_state(ScreenState::InGame)),
             );

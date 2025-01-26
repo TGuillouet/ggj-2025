@@ -2,10 +2,12 @@ use std::time::Duration;
 
 use bevy::{
     color::palettes::css::{BLACK, RED},
+    ecs::system::SystemParam,
     prelude::*,
 };
 use bevy_rapier2d::prelude::{
-    ActiveCollisionTypes, ActiveEvents, Collider, CollisionEvent, RigidBody, Sensor, Velocity,
+    ActiveCollisionTypes, ActiveEvents, BevyPhysicsHooks, Collider, CollisionEvent,
+    PairFilterContextView, RigidBody, Sensor, SolverFlags, Velocity,
 };
 use rand::Rng;
 
